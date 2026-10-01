@@ -17,3 +17,7 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+output/
+chromedriver.exe
+cucumber.html
