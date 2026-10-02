@@ -5,4 +5,4 @@ Feature: Parabank Login
     Given User is on Parabank login page
     When User logs in with valid data
     Then User should see Accounts Overview
-    And User closes the browser
+    And User logs off
