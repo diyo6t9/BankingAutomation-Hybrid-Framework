@@ -1,4 +1,4 @@
-@Sanity
+@Login
 Feature: Parabank Login
 
   Scenario: Valid login
