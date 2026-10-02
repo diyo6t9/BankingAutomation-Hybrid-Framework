@@ -1,6 +1,6 @@
 <users>
     <user>
-        <userId>john</userId>
+        <Username>john</Username>
         <password>demo</password>
     </user>
 </users>
