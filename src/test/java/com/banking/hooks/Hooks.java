@@ -14,6 +14,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -23,6 +24,9 @@ import java.time.format.DateTimeFormatter;
 public class Hooks {
 
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss");
+
+    // Run with -Dheadless=true (for example from Jenkins) to start Chrome without a visible window
+    private static final boolean HEADLESS = Boolean.getBoolean("headless");
 
     // Cucumber creates a new Hooks object for every scenario, so these are safe in parallel runs
     private int stepCounter = 0;
@@ -39,10 +43,11 @@ public class Hooks {
 
         WordReportGenerator.startScenario(currentFeature, currentScenario);
 
-        WebDriverManager.chromedriver().setup();
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = createDriver();
         DriverManager.setDriver(driver); // set first, so @After can always quit it
-        driver.manage().window().maximize();
+        if (!HEADLESS) {
+            driver.manage().window().maximize();
+        }
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(ConfigReader.getImplicitWait()));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(ConfigReader.getExplicitWait()));
         driver.get(ConfigReader.getUrl());
@@ -76,6 +81,17 @@ public class Hooks {
         } finally {
             DriverManager.quitDriver(); // always runs, even if report saving fails
         }
+    }
+
+    private WebDriver createDriver() {
+        WebDriverManager.chromedriver().setup();
+
+        ChromeOptions options = new ChromeOptions();
+        if (HEADLESS) {
+            options.addArguments("--headless=new", "--window-size=1920,1080",
+                    "--no-sandbox", "--disable-dev-shm-usage");
+        }
+        return new ChromeDriver(options);
     }
 
     // Waits until the browser reports the page as fully loaded, so the screenshot
