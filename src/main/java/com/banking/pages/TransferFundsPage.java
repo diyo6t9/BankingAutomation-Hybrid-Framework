@@ -4,6 +4,10 @@ import com.banking.base.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
 
 public class TransferFundsPage extends BasePage {
 
@@ -42,5 +46,14 @@ public class TransferFundsPage extends BasePage {
 
     public boolean isTransferSuccessful() {
         return isDisplayed(transferCompleteMsg);
+    }
+    public boolean isTransferSuccessfulQuick() {
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(3))
+                    .until(ExpectedConditions.visibilityOfElementLocated(transferCompleteMsg));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 }

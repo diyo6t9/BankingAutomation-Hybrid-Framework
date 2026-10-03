@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BillPay>
+    <Payee>
+        <PayeeName>Diyo Company</PayeeName>
+        <Address>123 Main St</Address>
+        <City>Pune</City>
+        <State>MH</State>
+        <ZipCode>411001</ZipCode>
+        <Phone>9876543210</Phone>
+        <AccountNumber>12345</AccountNumber>
+    </Payee>
+    <Amount>100</Amount>
+</BillPay>

@@ -38,4 +38,20 @@ public class TransferFundsSteps {
         TransferFundsPage transferPage = new TransferFundsPage(getDriver());
         Assert.assertTrue(transferPage.isTransferSuccessful(), "Transfer Failed - Success message not displayed!");
     }
+
+    // ===================== NEGATIVE STEPS =====================
+
+    @When("User transfers the amount {string}")
+    public void user_transfers_the_amount(String amount) {
+        WordReportGenerator.setCurrentStep("When User transfers the amount \"" + amount + "\"");
+        TransferFundsPage transferPage = new TransferFundsPage(getDriver());
+        transferPage.transferFunds(amount);
+    }
+
+    @Then("Transfer should not be successful")
+    public void transfer_should_not_be_successful() {
+        WordReportGenerator.setCurrentStep("Then Transfer should not be successful");
+        TransferFundsPage transferPage = new TransferFundsPage(getDriver());
+        Assert.assertFalse(transferPage.isTransferSuccessfulQuick(), "Transfer succeeded for an invalid amount");
+    }
 }

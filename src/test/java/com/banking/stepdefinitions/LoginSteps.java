@@ -1,6 +1,7 @@
 package com.banking.stepdefinitions;
 
 import com.banking.pages.LoginPage;
+import com.banking.utils.ConfigReader;
 import com.banking.utils.DriverManager;
 import com.banking.utils.WordReportGenerator;
 import com.banking.utils.XmlDataReader;
@@ -9,7 +10,8 @@ import org.testng.Assert;
 
 public class LoginSteps {
     LoginPage loginPage;
-    private static final String XML_PATH = "src/test/resources/testdata/Login_Data.xml";
+
+    // ===================== COMMON STEPS =====================
 
     @Given("User is on Parabank login page")
     public void user_is_on_login() {
@@ -20,7 +22,7 @@ public class LoginSteps {
     @When("User logs in with valid data")
     public void user_logs_in() {
         WordReportGenerator.setCurrentStep("When User logs in with valid data");
-        String[] data = XmlDataReader.getLoginData(XML_PATH);
+        String[] data = XmlDataReader.getLoginData();
         loginPage.login(data[0], data[1]);
     }
 
@@ -40,8 +42,38 @@ public class LoginSteps {
     @Given("User is logged in to Parabank")
     public void user_is_logged_in() {
         WordReportGenerator.setCurrentStep("Given User is logged in to Parabank");
-        String[] data = XmlDataReader.getLoginData(XML_PATH);
+        String[] data = XmlDataReader.getLoginData();
         loginPage = new LoginPage(DriverManager.getDriver());
         loginPage.login(data[0], data[1]);
+    }
+
+    // ===================== NEGATIVE STEPS =====================
+
+    @When("User logs in with username {string} and password {string}")
+    public void user_logs_in_with_username_and_password(String username, String password) {
+        WordReportGenerator.setCurrentStep(
+                "When User logs in with username \"" + username + "\" and password \"" + password + "\"");
+        loginPage.login(username, password);
+    }
+
+    @Then("User should see login error {string}")
+    public void user_should_see_login_error(String expectedMessage) {
+        WordReportGenerator.setCurrentStep("Then User should see login error \"" + expectedMessage + "\"");
+        String actual = loginPage.getLoginError().trim();
+        Assert.assertEquals(actual, expectedMessage, "Unexpected login error message");
+    }
+
+    @When("User opens the Accounts Overview page directly")
+    public void user_opens_accounts_overview_directly() {
+        WordReportGenerator.setCurrentStep("When User opens the Accounts Overview page directly");
+        String overviewUrl = ConfigReader.getUrl().replace("index.htm", "overview.htm");
+        DriverManager.getDriver().get(overviewUrl);
+    }
+
+    @Then("User should be redirected to the login page")
+    public void user_should_be_redirected_to_login_page() {
+        WordReportGenerator.setCurrentStep("Then User should be redirected to the login page");
+        Assert.assertTrue(loginPage.isCustomerLoginDisplayed(),
+                "Protected page was reachable after logout - login page not shown");
     }
 }

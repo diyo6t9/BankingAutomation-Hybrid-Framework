@@ -1,4 +1,4 @@
-@OpenAccount
+@Sanity @OpenAccount
 Feature: Parabank Open New Account
 
   Scenario: Open new SAVINGS account
