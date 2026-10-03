@@ -1,4 +1,4 @@
-@BillPay
+@Sanity @BillPay
 Feature: Parabank Bill Pay
 
   Scenario: Valid bill payment

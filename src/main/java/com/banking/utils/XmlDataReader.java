@@ -3,25 +3,30 @@ package com.banking.utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class XmlDataReader {
 
-    public static String getValue(String fileName, String tagName) {
-        try {
-            String file = "testdata/" + fileName + "_Data.xml";
-            InputStream is = XmlDataReader.class.getClassLoader().getResourceAsStream(file);
+    private XmlDataReader() {
+        // utility class - no objects needed
+    }
 
+    // Reads the first tag named tagName (case-insensitive) from testdata/<fileName>_Data.xml
+    public static String getValue(String fileName, String tagName) {
+        String file = "testdata/" + fileName + "_Data.xml";
+
+        try (InputStream is = XmlDataReader.class.getClassLoader().getResourceAsStream(file)) {
             if (is == null) {
-                System.err.println("XML File NOT FOUND: " + file);
-                return "";
+                throw new IllegalStateException("XML test data file not found: " + file);
             }
 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(is);
+            Document doc = createSecureBuilder().parse(is);
             doc.getDocumentElement().normalize();
 
             NodeList allNodes = doc.getElementsByTagName("*");
@@ -31,22 +36,27 @@ public class XmlDataReader {
                     return node.getTextContent().trim();
                 }
             }
-            System.err.println("Tag NOT FOUND: " + tagName + " in file: " + file);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | SAXException | ParserConfigurationException e) {
+            throw new IllegalStateException("Could not read XML test data file: " + file, e);
         }
-        return "";
+
+        throw new IllegalStateException("Tag '" + tagName + "' not found in XML test data file: " + file);
     }
 
-    public static String[] getLoginData(String xmlPath) {
+    public static String[] getLoginData() {
         String[] data = new String[2];
         data[0] = getValue("Login", "Username");
         data[1] = getValue("Login", "Password");
         return data;
     }
 
-    public static String getValue(String filePath, String parentTag, String childTag) {
-        return getValue(parentTag, childTag);
+    // Parser with external entities and DOCTYPE declarations disabled (protects against XXE)
+    private static DocumentBuilder createSecureBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+        return factory.newDocumentBuilder();
     }
 }

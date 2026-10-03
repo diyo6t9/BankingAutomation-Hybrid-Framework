@@ -1,4 +1,4 @@
-@Transfer
+@Sanity @Transfer
 Feature: Fund Transfer
 
   Scenario: Transfer amount between accounts
