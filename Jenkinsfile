@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    // These names must match what you add under Manage Jenkins > Tools
+    tools {
+        maven 'Maven3'
+    }
+
     parameters {
         string(name: 'TAGS',
                defaultValue: '@Sanity',
@@ -14,13 +19,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-            }
-        }
-
-        stage('Check Java and Maven') {
-            steps {
-                bat 'java -version'
-                bat 'mvn -version'
             }
         }
 
